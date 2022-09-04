@@ -6,7 +6,7 @@
       <label :for="id" class="checkbox-label">{{isNewLabel}}</label>
     </div>
     <div class="btn-group">
-      <button type="button" class="btn"  @click="toggleToItemEditForm">
+      <button type="button" class="btn"  @click="toggleToItemEditForm" ref="editButton">
         Edit <span class="visually-hidden">{{isNewLabel}}</span>
       </button>
       <button type="button" class="btn btn__danger" @click="deleteToDo">
@@ -14,7 +14,7 @@
       </button>
     </div>
   </div>
-  <to-do-item-edit-form v-else :id="id" :label="isNewLabel" @item-edited="editLabel" @edit-cancelled="{{this.isEditing=false;}}"></to-do-item-edit-form>
+  <to-do-item-edit-form v-else :id="id" :label="isNewLabel" @item-edited="itemEdited" @edit-cancelled="editCancelled"></to-do-item-edit-form>
 </template>
 
 <script>
@@ -43,10 +43,21 @@ export default {
     deleteToDo() {
       this.$emit('item-deleted', this.id);
     },
-    editLabel(modifiedLabel) {
+    itemEdited(modifiedLabel) {
       this.isNewLabel = modifiedLabel;
       this.isEditing = false;
-    } 
+      this.focusOnEditButton();
+    },
+    editCancelled() {
+      this.isEditing = false;
+      this.focusOnEditButton();
+    },
+    focusOnEditButton() {
+      this.$nextTick(() => {
+        const editButtonRef = this.$refs.editButton;
+        editButtonRef.focus();
+      });
+    }
   },
   computed: {
     isDone () {
